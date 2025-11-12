@@ -31,19 +31,12 @@ cd server && npm install
 cd ../client && npm install
 ```
 
-2. **Setup environment:**
-```bash
-# In server/.env
-MONGODB_URI=mongodb://localhost:27017/collaborative-chat
-OPENAI_API_KEY=your_openai_api_key_here
-```
+2. **Setup Firebase:**
+   - See [README-SETUP.md](README-SETUP.md) for detailed Firebase configuration
+   - Copy `server/.env.example` to `server/.env`
+   - Add your Firebase and OpenAI API keys
 
-3. **Start MongoDB:**
-```bash
-mongod
-```
-
-4. **Run the app:**
+3. **Run the app:**
 ```bash
 npm run dev
 ```
@@ -59,16 +52,16 @@ npm run dev
 
 ## 🛠️ Tech Stack
 
-**Backend:** Node.js, Express, Socket.io, MongoDB, OpenAI API
+**Backend:** Node.js, Express, Socket.io, Firebase Firestore, OpenAI API
 **Frontend:** Next.js, React, Tailwind CSS, Zustand
 
 ## 📁 Project Structure
 
 ```
 ├── server/
-│   ├── models/Room.js      # MongoDB schema
-│   ├── services/aiService.js # AI integration
-│   └── server.js           # Main server
+│   ├── services/firebaseService.js # Firebase integration
+│   ├── services/aiService.js       # AI integration
+│   └── server.js                   # Main server
 └── client/
     ├── app/                # Next.js app router
     ├── components/         # React components
