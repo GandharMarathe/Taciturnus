@@ -2,10 +2,14 @@ const OpenAI = require('openai');
 
 class AIService {
   constructor() {
-    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    this.openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
   }
 
   async processMessage(messages, command, mode = 'summarizer') {
+    if (!this.openai) {
+      return 'AI is currently unavailable. Please add OPENAI_API_KEY to .env file.';
+    }
+
     const prompts = {
       summarizer: 'Summarize the following chat messages concisely:',
       brainstorm: 'Based on these messages, suggest 3 creative ideas:',
