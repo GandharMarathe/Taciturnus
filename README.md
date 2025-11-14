@@ -4,82 +4,104 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14+-blue.svg)](https://nextjs.org/)
 
-A real-time collaborative chatroom with AI assistant integration.
+A real-time collaborative chatroom application with integrated AI assistant capabilities.
 
-![Demo](https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=Collaborative+AI+Chat+Demo)
+## Overview
 
-## 🌟 Overview
+This application enables multiple users to engage in real-time conversations with intelligent AI assistance. The platform combines modern web technologies with AI features to enhance group discussions and productivity.
 
-Build meaningful conversations with AI assistance. This application combines real-time chat with intelligent AI features to enhance group discussions and productivity.
+## Key Features
 
-## Features
+- Multi-user real-time chat powered by Socket.io
+- AI Assistant with 4 operational modes: Summarizer, Brainstorm, Moderator, and Research
+- Command-based AI interactions: @AI summarize, @AI next steps, @AI explain
+- Automated conversation summaries generated every 10 minutes
+- Chat export functionality to text files
+- Room-based system with unique access codes
+- Modern Discord-inspired user interface with participant sidebar
 
-- **Multi-user real-time chat** with Socket.io
-- **AI Assistant** with 4 modes: Summarizer, Brainstorm, Moderator, Research
-- **AI Commands**: @AI summarize, @AI next steps, @AI explain
-- **Auto-summaries** every 10 minutes
-- **Export chat** to text file
-- **Room system** with unique codes
-- **Discord-like UI** with participant sidebar
+## Getting Started
 
-## 🚀 Quick Start
+### Prerequisites
 
-1. **Install dependencies:**
+- Node.js 18 or higher
+- Firebase account with Firestore enabled
+- OpenAI API key (optional for AI features)
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/collaborative-ai-chat.git
+cd collaborative-ai-chat
+```
+
+2. Install dependencies
 ```bash
 npm install
 cd server && npm install
 cd ../client && npm install
 ```
 
-2. **Setup Firebase:**
-   - See [README-SETUP.md](README-SETUP.md) for detailed Firebase configuration
+3. Configure Firebase
+   - Refer to [README-SETUP.md](README-SETUP.md) for detailed Firebase configuration steps
    - Copy `server/.env.example` to `server/.env`
-   - Add your Firebase and OpenAI API keys
+   - Add your Firebase credentials and OpenAI API key
 
-3. **Run the app:**
+4. Start the application
 ```bash
 npm run dev
 ```
 
-- Server: http://localhost:3001
-- Client: http://localhost:3000
+The server will run on http://localhost:3001 and the client on http://localhost:3000
 
-## 🤖 AI Commands
+## AI Commands
 
-- `@AI summarize` - Summarize recent discussion
-- `@AI next steps` - Suggest action items
-- `@AI explain [topic]` - Research and explain
+Interact with the AI assistant using these commands:
 
-## 🛠️ Tech Stack
+- `@AI summarize` - Generate a summary of recent discussion
+- `@AI next steps` - Get suggested action items based on conversation
+- `@AI explain [topic]` - Request research and explanation on a specific topic
 
-**Backend:** Node.js, Express, Socket.io, Firebase Firestore, OpenAI API
-**Frontend:** Next.js, React, Tailwind CSS, Zustand
+## Technology Stack
 
-## 📁 Project Structure
+### Backend
+- Node.js
+- Express
+- Socket.io
+- Firebase Firestore
+- OpenAI API
+
+### Frontend
+- Next.js 14
+- React 18
+- Tailwind CSS
+- Zustand (State Management)
+
+## Project Structure
 
 ```
 ├── server/
-│   ├── services/firebaseService.js # Firebase integration
-│   ├── services/aiService.js       # AI integration
-│   └── server.js                   # Main server
+│   ├── services/
+│   │   ├── firebaseService.js    # Firebase database operations
+│   │   └── aiService.js          # OpenAI integration
+│   └── server.js                 # Express server and Socket.io setup
 └── client/
-    ├── app/                # Next.js app router
-    ├── components/         # React components
-    └── stores/             # Zustand state
+    ├── app/                      # Next.js app router
+    ├── components/               # React components
+    └── stores/                   # Zustand state management
 ```
 
-## 🤝 Contributing
+## Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and development workflow.
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for complete details.
 
-## 🐛 Issues
+## Issues and Support
 
-Found a bug or have a feature request? Please open an issue on [GitHub Issues](https://github.com/yourusername/collaborative-ai-chat/issues).
+For bug reports or feature requests, please open an issue on the [GitHub Issues](https://github.com/yourusername/collaborative-ai-chat/issues) page.
 
-## ⭐ Support
-
-If you find this project helpful, please give it a star on GitHub!
+If you find this project useful, consider giving it a star on GitHub.
