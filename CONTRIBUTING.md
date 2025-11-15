@@ -5,8 +5,8 @@
 1. Fork the repository
 2. Clone your fork: `git clone https://github.com/yourusername/collaborative-ai-chat.git`
 3. Install dependencies: `npm install && cd server && npm install && cd ../client && npm install`
-4. Copy `server/.env.example` to `server/.env` and add your OpenAI API key
-5. Start MongoDB locally
+4. Copy `server/.env.example` to `server/.env` and add your Firebase credentials
+5. Configure Firebase Firestore (see README-SETUP.md)
 6. Run the development server: `npm run dev`
 
 ## Development Guidelines

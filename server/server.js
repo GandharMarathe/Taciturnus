@@ -91,7 +91,7 @@ setInterval(async () => {
     
     const summaryMessage = {
       sender: 'AI Assistant',
-      text: `📋 **Auto Summary**: ${summary}`,
+      text: `**Auto Summary**: ${summary}`,
       timestamp: new Date(),
       isAI: true
     };
