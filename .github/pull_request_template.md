@@ -1,5 +1,5 @@
 ## Description
-Brief description of changes made.
+<!-- Provide a brief description of the changes -->
 
 ## Type of Change
 - [ ] Bug fix
@@ -8,12 +8,14 @@ Brief description of changes made.
 - [ ] Documentation update
 
 ## Testing
+<!-- Describe the tests you ran -->
 - [ ] Tested locally
 - [ ] All existing tests pass
-- [ ] Added new tests if applicable
 
 ## Checklist
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
-- [ ] Documentation updated if needed
-- [ ] No new warnings introduced
+- [ ] Comments added for complex code
+- [ ] Documentation updated
+- [ ] No new warnings generated
+- [ ] Environment variables documented in .env.example

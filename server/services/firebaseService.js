@@ -1,72 +1,137 @@
-const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, collection, getDocs } = require('firebase/firestore');
+const admin = require('firebase-admin');
 
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
-};
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+  })
+});
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = admin.firestore();
 
 class FirebaseService {
   async createRoom(roomId, name, username) {
-    await setDoc(doc(db, 'rooms', roomId), {
-      roomId,
-      name,
-      participants: [username],
-      messages: [],
-      aiMode: 'summarizer',
-      lastSummary: new Date(),
-      createdAt: new Date()
-    });
-    return { roomId, name };
+    try {
+      await db.collection('rooms').doc(roomId).set({
+        roomId,
+        name,
+        participants: [username],
+        aiMode: 'summarizer',
+        lastSummary: admin.firestore.Timestamp.now(),
+        createdAt: admin.firestore.Timestamp.now()
+      });
+      return { roomId, name };
+    } catch (error) {
+      console.error('Create room error:', error);
+      throw new Error('Failed to create room');
+    }
   }
 
   async joinRoom(roomId, username) {
-    const roomRef = doc(db, 'rooms', roomId);
-    const roomSnap = await getDoc(roomRef);
-    
-    if (!roomSnap.exists()) return null;
-    
-    await updateDoc(roomRef, {
-      participants: arrayUnion(username)
-    });
-    
-    return roomSnap.data();
+    try {
+      const roomRef = db.collection('rooms').doc(roomId);
+      const roomSnap = await roomRef.get();
+      
+      if (!roomSnap.exists) return null;
+      
+      await roomRef.update({
+        participants: admin.firestore.FieldValue.arrayUnion(username)
+      });
+      
+      return roomSnap.data();
+    } catch (error) {
+      console.error('Join room error:', error);
+      throw new Error('Failed to join room');
+    }
   }
 
   async addMessage(roomId, message) {
-    const roomRef = doc(db, 'rooms', roomId);
-    await updateDoc(roomRef, {
-      messages: arrayUnion(message)
-    });
+    try {
+      await db.collection('rooms').doc(roomId)
+        .collection('messages').add({
+          ...message,
+          timestamp: admin.firestore.Timestamp.now()
+        });
+    } catch (error) {
+      console.error('Add message error:', error);
+      throw new Error('Failed to add message');
+    }
   }
 
-  async getMessages(roomId) {
-    const roomSnap = await getDoc(doc(db, 'rooms', roomId));
-    return roomSnap.exists() ? roomSnap.data().messages || [] : [];
+  async getMessages(roomId, limit = 50) {
+    try {
+      const snapshot = await db.collection('rooms').doc(roomId)
+        .collection('messages')
+        .orderBy('timestamp', 'desc')
+        .limit(limit)
+        .get();
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate()
+      })).reverse();
+    } catch (error) {
+      console.error('Get messages error:', error);
+      return [];
+    }
   }
 
   async getAiMode(roomId) {
-    const roomSnap = await getDoc(doc(db, 'rooms', roomId));
-    return roomSnap.exists() ? roomSnap.data().aiMode : 'summarizer';
+    try {
+      const roomSnap = await db.collection('rooms').doc(roomId).get();
+      return roomSnap.exists ? roomSnap.data().aiMode : 'summarizer';
+    } catch (error) {
+      console.error('Get AI mode error:', error);
+      return 'summarizer';
+    }
   }
 
   async updateAiMode(roomId, mode) {
-    await updateDoc(doc(db, 'rooms', roomId), { aiMode: mode });
+    try {
+      await db.collection('rooms').doc(roomId).update({ aiMode: mode });
+    } catch (error) {
+      console.error('Update AI mode error:', error);
+      throw new Error('Failed to update AI mode');
+    }
   }
 
   async getRoomsForSummary() {
-    return [];
+    try {
+      const tenMinutesAgo = admin.firestore.Timestamp.fromDate(
+        new Date(Date.now() - 10 * 60 * 1000)
+      );
+      
+      const snapshot = await db.collection('rooms')
+        .where('lastSummary', '<', tenMinutesAgo)
+        .get();
+      
+      return snapshot.docs.map(doc => doc.data());
+    } catch (error) {
+      console.error('Get rooms for summary error:', error);
+      return [];
+    }
   }
 
   async updateLastSummary(roomId) {
-    await updateDoc(doc(db, 'rooms', roomId), { lastSummary: new Date() });
+    try {
+      await db.collection('rooms').doc(roomId).update({
+        lastSummary: admin.firestore.Timestamp.now()
+      });
+    } catch (error) {
+      console.error('Update last summary error:', error);
+    }
+  }
+
+  async roomExists(roomId) {
+    try {
+      const roomSnap = await db.collection('rooms').doc(roomId).get();
+      return roomSnap.exists;
+    } catch (error) {
+      console.error('Room exists check error:', error);
+      return false;
+    }
   }
 }
 

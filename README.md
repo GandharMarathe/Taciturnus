@@ -25,35 +25,36 @@ This application enables multiple users to engage in real-time conversations wit
 ### Prerequisites
 
 - Node.js 18 or higher
-- Firebase account with Firestore enabled
+- Firebase project with Firestore enabled
+- Firebase Admin SDK credentials
 - OpenAI API key (optional for AI features)
 
 ### Installation
 
-1. Clone the repository
+See [SETUP-INSTRUCTIONS.md](SETUP-INSTRUCTIONS.md) for detailed setup guide.
+
+**Quick Start:**
+
+1. Clone and install:
 ```bash
 git clone https://github.com/yourusername/collaborative-ai-chat.git
 cd collaborative-ai-chat
-```
-
-2. Install dependencies
-```bash
 npm install
 cd server && npm install
 cd ../client && npm install
 ```
 
-3. Configure Firebase
-   - Refer to [README-SETUP.md](README-SETUP.md) for detailed Firebase configuration steps
+2. Configure Firebase Admin SDK:
+   - Get service account credentials from Firebase Console
    - Copy `server/.env.example` to `server/.env`
-   - Add your Firebase credentials and OpenAI API key
+   - Add Firebase Admin credentials and OpenAI API key
 
-4. Start the application
+3. Run:
 ```bash
 npm run dev
 ```
 
-The server will run on http://localhost:3001 and the client on http://localhost:3000
+Server: http://localhost:3001 | Client: http://localhost:3000
 
 ## AI Commands
 
@@ -100,8 +101,22 @@ Contributions are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md) for 
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for complete details.
 
+## Security
+
+See [SECURITY.md](SECURITY.md) for security policy and reporting vulnerabilities.
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## Issues and Support
 
-For bug reports or feature requests, please open an issue on the [GitHub Issues](https://github.com/yourusername/collaborative-ai-chat/issues) page.
+For bug reports or feature requests, please open an issue on the GitHub Issues page.
 
-If you find this project useful, consider giving it a star on GitHub.
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.

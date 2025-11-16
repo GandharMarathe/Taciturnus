@@ -10,21 +10,36 @@ export default function JoinRoom({ onJoin }) {
   
   const { setUsername: setStoreUsername, joinRoom, createRoom } = useChatStore();
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   const handleJoin = async (e) => {
     e.preventDefault();
     if (!username.trim()) return;
     
+    setLoading(true);
+    setError('');
     setStoreUsername(username);
     
-    if (isCreating) {
-      const newRoomId = await createRoom(roomName);
-      if (newRoomId) {
-        await joinRoom(newRoomId);
-        onJoin();
+    try {
+      if (isCreating) {
+        const newRoomId = await createRoom(roomName);
+        if (newRoomId) {
+          const success = await joinRoom(newRoomId);
+          if (success) onJoin();
+          else setError('Failed to join room');
+        } else {
+          setError('Failed to create room');
+        }
+      } else {
+        const success = await joinRoom(roomId);
+        if (success) onJoin();
+        else setError('Room not found or failed to join');
       }
-    } else {
-      await joinRoom(roomId);
-      onJoin();
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,11 +124,18 @@ export default function JoinRoom({ onJoin }) {
             </div>
           )}
 
+          {error && (
+            <div className="text-red-500 text-sm text-center">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 font-medium"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {isCreating ? 'Create & Join Room' : 'Join Room'}
+            {loading ? 'Loading...' : isCreating ? 'Create & Join Room' : 'Join Room'}
           </button>
         </form>
       </div>

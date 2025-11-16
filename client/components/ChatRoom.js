@@ -13,9 +13,19 @@ export default function ChatRoom() {
     participants,
     username,
     aiMode,
+    error,
+    isConnected,
     sendMessage,
-    changeAIMode
+    changeAIMode,
+    clearError
   } = useChatStore();
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => clearError(), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -90,6 +100,20 @@ export default function ChatRoom() {
 
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
+        {/* Connection Status */}
+        {!isConnected && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 text-sm text-center">
+            Reconnecting to server...
+          </div>
+        )}
+        
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-2 text-sm text-center">
+            {error}
+          </div>
+        )}
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message, i) => (
@@ -123,7 +147,8 @@ export default function ChatRoom() {
             />
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
+              disabled={!isConnected}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />
             </button>
