@@ -60,7 +60,11 @@ export default function ChatRoom() {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-64 bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold mb-4">{room.name}</h2>
+        <h2 className="text-xl font-bold mb-2">{room.name}</h2>
+        <div className="mb-4 p-2 bg-gray-700 rounded text-sm">
+          <div className="text-gray-300 text-xs mb-1">Room ID (share to invite):</div>
+          <div className="font-mono text-blue-300 select-all">{room.roomId}</div>
+        </div>
         
         <div className="mb-6">
           <div className="flex items-center mb-2">
@@ -118,7 +122,7 @@ export default function ChatRoom() {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message, i) => (
             <div key={i} className={`flex ${message.sender === username ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+              <div className={`max-w-lg lg:max-w-2xl px-4 py-2 rounded-lg ${
                 message.isAI 
                   ? 'bg-blue-100 border-l-4 border-blue-500' 
                   : message.sender === username 

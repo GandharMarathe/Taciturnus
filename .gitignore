@@ -11,6 +11,10 @@ yarn-error.log*
 server/.env
 client/.env.local
 
+# Firebase credentials
+server/serviceAccountKey.json
+serviceAccountKey.json
+
 # Next.js
 .next/
 out/
