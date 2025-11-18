@@ -57,45 +57,52 @@ export default function ChatRoom() {
   if (!room) return <div>Loading...</div>;
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100 animate-fade-in">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold mb-2">{room.name}</h2>
-        <div className="mb-4 p-2 bg-gray-700 rounded text-sm">
+      <div className="w-64 bg-gradient-to-b from-gray-800 to-gray-900 text-white p-4 shadow-2xl animate-slide-in-left">
+        <h2 className="text-xl font-bold mb-2 animate-slide-down">{room.name}</h2>
+        <div className="mb-4 p-3 bg-gray-700/50 backdrop-blur-sm rounded-xl text-sm border border-gray-600/30 animate-slide-down-delay">
           <div className="text-gray-300 text-xs mb-1">Room ID (share to invite):</div>
-          <div className="font-mono text-blue-300 select-all">{room.roomId}</div>
+          <div className="font-mono text-blue-300 select-all bg-gray-800/50 p-2 rounded-lg">{room.roomId}</div>
         </div>
         
-        <div className="mb-6">
-          <div className="flex items-center mb-2">
-            <Users className="w-4 h-4 mr-2" />
+        <div className="mb-6 animate-slide-down-delay-2">
+          <div className="flex items-center mb-3">
+            <Users className="w-4 h-4 mr-2 text-green-400" />
             <span className="text-sm font-medium">Participants ({participants.length})</span>
           </div>
-          {participants.map(p => (
-            <div key={p} className="text-sm text-gray-300 ml-6">{p}</div>
-          ))}
+          <div className="space-y-2">
+            {participants.map((p, i) => (
+              <div key={p} className="text-sm text-gray-300 ml-6 p-2 bg-gray-700/30 rounded-lg animate-fade-in-up" style={{animationDelay: `${i * 100}ms`}}>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                  {p}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mb-6">
-          <div className="flex items-center mb-2">
-            <Bot className="w-4 h-4 mr-2" />
+        <div className="mb-6 animate-slide-down-delay-3">
+          <div className="flex items-center mb-3">
+            <Bot className="w-4 h-4 mr-2 text-purple-400" />
             <span className="text-sm font-medium">AI Mode</span>
           </div>
           <select 
             value={aiMode} 
             onChange={(e) => changeAIMode(e.target.value)}
-            className="w-full bg-gray-700 text-white text-sm p-2 rounded"
+            className="w-full bg-gray-700/50 backdrop-blur-sm text-white text-sm p-3 rounded-xl border border-gray-600/30 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
           >
-            <option value="summarizer">Summarizer</option>
-            <option value="brainstorm">Brainstorm</option>
-            <option value="moderator">Moderator</option>
-            <option value="research">Research</option>
+            <option value="summarizer">📝 Summarizer</option>
+            <option value="brainstorm">💡 Brainstorm</option>
+            <option value="moderator">⚖️ Moderator</option>
+            <option value="research">🔍 Research</option>
           </select>
         </div>
 
         <button 
           onClick={exportChat}
-          className="flex items-center text-sm text-gray-300 hover:text-white"
+          className="flex items-center text-sm text-gray-300 hover:text-white p-2 rounded-lg hover:bg-gray-700/50 transition-all duration-200 transform hover:scale-105 animate-slide-down-delay-4"
         >
           <Download className="w-4 h-4 mr-2" />
           Export Chat
@@ -103,17 +110,20 @@ export default function ChatRoom() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col animate-slide-in-right">
         {/* Connection Status */}
         {!isConnected && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 text-sm text-center">
-            Reconnecting to server...
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 p-3 text-sm text-center animate-pulse backdrop-blur-sm">
+            <div className="flex items-center justify-center">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2 animate-ping"></div>
+              Reconnecting to server...
+            </div>
           </div>
         )}
         
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-2 text-sm text-center">
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 text-sm text-center animate-shake backdrop-blur-sm">
             {error}
           </div>
         )}
@@ -121,18 +131,23 @@ export default function ChatRoom() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message, i) => (
-            <div key={i} className={`flex ${message.sender === username ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-lg lg:max-w-2xl px-4 py-2 rounded-lg ${
+            <div key={i} className={`flex ${message.sender === username ? 'justify-end' : 'justify-start'} animate-message-in`} style={{animationDelay: `${i * 50}ms`}}>
+              <div className={`max-w-lg lg:max-w-2xl px-4 py-3 rounded-2xl shadow-sm transform hover:scale-105 transition-all duration-200 ${
                 message.isAI 
-                  ? 'bg-blue-100 border-l-4 border-blue-500' 
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 shadow-blue-100' 
                   : message.sender === username 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-white border'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-blue-200' 
+                    : 'bg-white border border-gray-200 shadow-gray-100 hover:shadow-md'
               }`}>
-                <div className="text-xs text-gray-500 mb-1">
-                  {message.sender} • {format(new Date(message.timestamp), 'HH:mm')}
+                <div className={`text-xs mb-2 flex items-center ${
+                  message.isAI ? 'text-blue-600' : message.sender === username ? 'text-blue-100' : 'text-gray-500'
+                }`}>
+                  {message.isAI && <Bot className="w-3 h-3 mr-1" />}
+                  <span className="font-medium">{message.sender}</span>
+                  <span className="mx-1">•</span>
+                  <span>{format(new Date(message.timestamp), 'HH:mm')}</span>
                 </div>
-                <div className="text-sm">{message.text}</div>
+                <div className="text-sm leading-relaxed">{message.text}</div>
               </div>
             </div>
           ))}
@@ -140,25 +155,25 @@ export default function ChatRoom() {
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSend} className="p-4 border-t bg-white">
-          <div className="flex space-x-2">
+        <form onSubmit={handleSend} className="p-4 border-t bg-white/80 backdrop-blur-sm animate-slide-up">
+          <div className="flex space-x-3">
             <input
               type="text"
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               placeholder="Type a message... (use @AI for commands)"
-              className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
             />
             <button
               type="submit"
               disabled={!isConnected}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 flex items-center disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg shadow-blue-500/25 disabled:hover:scale-100 disabled:shadow-none"
             >
               <Send className="w-4 h-4" />
             </button>
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            Try: @AI summarize, @AI next steps, @AI explain [topic]
+          <div className="text-xs text-gray-500 mt-2 animate-fade-in-delay">
+            💡 Try: @AI summarize, @AI next steps, @AI explain [topic]
           </div>
         </form>
       </div>
