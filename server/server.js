@@ -89,16 +89,16 @@ io.on('connection', (socket) => {
 
   socket.on('send-message', async (data) => {
     try {
-      const { roomId, sender, text } = data;
-      const sanitizedText = sanitizeText(text);
+      const { roomId, sender, text, fileUrl, fileName } = data;
+      const sanitizedText = text ? sanitizeText(text) : '';
       const sanitizedSender = sanitizeUsername(sender);
       
-      if (!sanitizedText || !sanitizedSender) return;
+      if ((!sanitizedText && !fileUrl) || !sanitizedSender) return;
       
-      const message = { sender: sanitizedSender, text: sanitizedText };
+      const message = { sender: sanitizedSender, text: sanitizedText, fileUrl, fileName, reactions: {} };
       
-      await firebaseService.addMessage(roomId, message);
-      const savedMessage = { ...message, timestamp: new Date() };
+      const messageId = await firebaseService.addMessage(roomId, message);
+      const savedMessage = { ...message, id: messageId, timestamp: new Date() };
       io.to(roomId).emit('new-message', savedMessage);
 
       // Handle AI commands
@@ -136,6 +136,75 @@ io.on('connection', (socket) => {
       io.to(roomId).emit('ai-mode-changed', mode);
     } catch (error) {
       socket.emit('error', { message: 'Failed to change AI mode' });
+    }
+  });
+
+  socket.on('typing', (data) => {
+    socket.to(data.roomId).emit('user-typing', { username: data.username });
+  });
+
+  socket.on('stop-typing', (data) => {
+    socket.to(data.roomId).emit('user-stop-typing', { username: data.username });
+  });
+
+  socket.on('add-reaction', async (data) => {
+    try {
+      const { roomId, messageId, emoji, username } = data;
+      await firebaseService.addReaction(roomId, messageId, emoji, username);
+      io.to(roomId).emit('reaction-added', { messageId, emoji, username });
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to add reaction' });
+    }
+  });
+
+  socket.on('edit-message', async (data) => {
+    try {
+      const { roomId, messageId, newText } = data;
+      const sanitized = sanitizeText(newText);
+      await firebaseService.editMessage(roomId, messageId, sanitized);
+      io.to(roomId).emit('message-edited', { messageId, newText: sanitized });
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to edit message' });
+    }
+  });
+
+  socket.on('delete-message', async (data) => {
+    try {
+      const { roomId, messageId } = data;
+      await firebaseService.deleteMessage(roomId, messageId);
+      io.to(roomId).emit('message-deleted', { messageId });
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to delete message' });
+    }
+  });
+
+  socket.on('mark-read', async (data) => {
+    try {
+      const { roomId, messageId, username } = data;
+      await firebaseService.markAsRead(roomId, messageId, username);
+      socket.to(roomId).emit('message-read', { messageId, username });
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to mark as read' });
+    }
+  });
+
+  socket.on('pin-message', async (data) => {
+    try {
+      const { roomId, messageId } = data;
+      await firebaseService.pinMessage(roomId, messageId);
+      io.to(roomId).emit('message-pinned', { messageId });
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to pin message' });
+    }
+  });
+
+  socket.on('unpin-message', async (data) => {
+    try {
+      const { roomId, messageId } = data;
+      await firebaseService.unpinMessage(roomId, messageId);
+      io.to(roomId).emit('message-unpinned', { messageId });
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to unpin message' });
     }
   });
 

@@ -12,6 +12,7 @@ This application enables multiple users to engage in real-time conversations wit
 
 ## Key Features
 
+### Core Features
 - Multi-user real-time chat powered by Socket.io
 - AI Assistant with 4 operational modes: Summarizer, Brainstorm, Moderator, and Research
 - Command-based AI interactions: @AI summarize, @AI next steps, @AI explain
@@ -19,6 +20,18 @@ This application enables multiple users to engage in real-time conversations wit
 - Chat export functionality to text files
 - Room-based system with unique access codes
 - Modern Discord-inspired user interface with participant sidebar
+
+### New Enhanced Features
+- **Message Reactions** - React with text emojis (+1, heart, laugh, party, fire, clap)
+- **Typing Indicators** - See when others are typing
+- **Message Editing & Deletion** - Edit or delete your messages
+- **Dark/Light Theme** - Toggle between themes
+- **File Sharing** - Share images up to 5MB
+- **Read Receipts** - See who read your messages
+- **Pinned Messages** - Pin important messages to top
+- **Browser Notifications** - Desktop alerts for new messages
+
+See [NEW-FEATURES.md](NEW-FEATURES.md) for detailed documentation.
 
 ## Getting Started
 

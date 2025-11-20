@@ -46,11 +46,15 @@ class FirebaseService {
 
   async addMessage(roomId, message) {
     try {
-      await db.collection('rooms').doc(roomId)
+      const docRef = await db.collection('rooms').doc(roomId)
         .collection('messages').add({
           ...message,
-          timestamp: admin.firestore.Timestamp.now()
+          timestamp: admin.firestore.Timestamp.now(),
+          reactions: {},
+          readBy: [],
+          edited: false
         });
+      return docRef.id;
     } catch (error) {
       console.error('Add message error:', error);
       throw new Error('Failed to add message');
@@ -129,6 +133,73 @@ class FirebaseService {
     } catch (error) {
       console.error('Room exists check error:', error);
       return false;
+    }
+  }
+
+  async addReaction(roomId, messageId, emoji, username) {
+    try {
+      const messageRef = db.collection('rooms').doc(roomId).collection('messages').doc(messageId);
+      const messageSnap = await messageRef.get();
+      const reactions = messageSnap.data()?.reactions || {};
+      
+      if (!reactions[emoji]) reactions[emoji] = [];
+      if (!reactions[emoji].includes(username)) {
+        reactions[emoji].push(username);
+      }
+      
+      await messageRef.update({ reactions });
+    } catch (error) {
+      console.error('Add reaction error:', error);
+      throw new Error('Failed to add reaction');
+    }
+  }
+
+  async editMessage(roomId, messageId, newText) {
+    try {
+      await db.collection('rooms').doc(roomId).collection('messages').doc(messageId)
+        .update({ text: newText, edited: true });
+    } catch (error) {
+      console.error('Edit message error:', error);
+      throw new Error('Failed to edit message');
+    }
+  }
+
+  async deleteMessage(roomId, messageId) {
+    try {
+      await db.collection('rooms').doc(roomId).collection('messages').doc(messageId).delete();
+    } catch (error) {
+      console.error('Delete message error:', error);
+      throw new Error('Failed to delete message');
+    }
+  }
+
+  async markAsRead(roomId, messageId, username) {
+    try {
+      await db.collection('rooms').doc(roomId).collection('messages').doc(messageId)
+        .update({ readBy: admin.firestore.FieldValue.arrayUnion(username) });
+    } catch (error) {
+      console.error('Mark as read error:', error);
+      throw new Error('Failed to mark as read');
+    }
+  }
+
+  async pinMessage(roomId, messageId) {
+    try {
+      await db.collection('rooms').doc(roomId).collection('messages').doc(messageId)
+        .update({ pinned: true });
+    } catch (error) {
+      console.error('Pin message error:', error);
+      throw new Error('Failed to pin message');
+    }
+  }
+
+  async unpinMessage(roomId, messageId) {
+    try {
+      await db.collection('rooms').doc(roomId).collection('messages').doc(messageId)
+        .update({ pinned: false });
+    } catch (error) {
+      console.error('Unpin message error:', error);
+      throw new Error('Failed to unpin message');
     }
   }
 }
