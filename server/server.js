@@ -55,7 +55,11 @@ app.post('/api/rooms/:roomId/join', validateJoin, async (req, res) => {
 
 app.get('/api/rooms/:roomId/messages', async (req, res) => {
   try {
-    const messages = await firebaseService.getMessages(req.params.roomId);
+    const { roomId } = req.params;
+    if (!roomId || typeof roomId !== 'string') {
+      return res.status(400).json({ error: 'Invalid room ID' });
+    }
+    const messages = await firebaseService.getMessages(roomId);
     res.json(messages);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -89,11 +93,12 @@ io.on('connection', (socket) => {
 
   socket.on('send-message', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, sender, text, fileUrl, fileName } = data;
       const sanitizedText = text ? sanitizeText(text) : '';
       const sanitizedSender = sanitizeUsername(sender);
       
-      if ((!sanitizedText && !fileUrl) || !sanitizedSender) return;
+      if ((!sanitizedText && !fileUrl) || !sanitizedSender || !roomId) return;
       
       const message = { sender: sanitizedSender, text: sanitizedText, fileUrl, fileName, reactions: {} };
       
@@ -127,10 +132,11 @@ io.on('connection', (socket) => {
 
   socket.on('change-ai-mode', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, mode } = data;
       const validModes = ['summarizer', 'brainstorm', 'moderator', 'research'];
       
-      if (!validModes.includes(mode)) return;
+      if (!validModes.includes(mode) || !roomId) return;
       
       await firebaseService.updateAiMode(roomId, mode);
       io.to(roomId).emit('ai-mode-changed', mode);
@@ -149,7 +155,9 @@ io.on('connection', (socket) => {
 
   socket.on('add-reaction', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, messageId, emoji, username } = data;
+      if (!roomId || !messageId || !emoji || !username) return;
       await firebaseService.addReaction(roomId, messageId, emoji, username);
       io.to(roomId).emit('reaction-added', { messageId, emoji, username });
     } catch (error) {
@@ -159,7 +167,9 @@ io.on('connection', (socket) => {
 
   socket.on('edit-message', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, messageId, newText } = data;
+      if (!roomId || !messageId || !newText) return;
       const sanitized = sanitizeText(newText);
       await firebaseService.editMessage(roomId, messageId, sanitized);
       io.to(roomId).emit('message-edited', { messageId, newText: sanitized });
@@ -170,7 +180,9 @@ io.on('connection', (socket) => {
 
   socket.on('delete-message', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, messageId } = data;
+      if (!roomId || !messageId) return;
       await firebaseService.deleteMessage(roomId, messageId);
       io.to(roomId).emit('message-deleted', { messageId });
     } catch (error) {
@@ -180,7 +192,9 @@ io.on('connection', (socket) => {
 
   socket.on('mark-read', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, messageId, username } = data;
+      if (!roomId || !messageId || !username) return;
       await firebaseService.markAsRead(roomId, messageId, username);
       socket.to(roomId).emit('message-read', { messageId, username });
     } catch (error) {
@@ -190,7 +204,9 @@ io.on('connection', (socket) => {
 
   socket.on('pin-message', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, messageId } = data;
+      if (!roomId || !messageId) return;
       await firebaseService.pinMessage(roomId, messageId);
       io.to(roomId).emit('message-pinned', { messageId });
     } catch (error) {
@@ -200,7 +216,9 @@ io.on('connection', (socket) => {
 
   socket.on('unpin-message', async (data) => {
     try {
+      if (!data || typeof data !== 'object') return;
       const { roomId, messageId } = data;
+      if (!roomId || !messageId) return;
       await firebaseService.unpinMessage(roomId, messageId);
       io.to(roomId).emit('message-unpinned', { messageId });
     } catch (error) {
